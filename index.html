@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Vancouver Deals for Food & Drinks</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="main">
+        <div class="header">
+            <div class="searchbar" data-bind="visible: searchBarShow() === true">
+                <h1>Vancouver Deals for Food & Drinks</h1>
+                <form data-bind="submit: processLocationSearch">
+                    <input type="text" placeholder="Find deals in your area" data-bind="value: searchLocation, selectOnFocus: true" id="autocomplete">
+                    <input type="submit" value="Search" id="submit">
+                    <p data-bind="text: searchStatus"></p>
+                </form>
+                <form data-bind="submit: filterResults" class="resultsform">
+                    <input type="text" placeholder="name/type" data-bind="value:filterKeyword, selectOnFocus: true">
+                    <input type="submit" value="Filtered!" id="submit">
+                    <p data-bind="visible: filterKeyword().length > 0, click: clearFilter" class="clearbutton">Clear filter</p>
+                </form>
+
+                <div title="Re-center map" class="locbtn-large" data-bind="click: centerMap">
+                    <i class="fa fa-compass fa-2x"></i>
+                </div>
+
+                <div class="results">
+                    <div>
+                        <h2 class="status-msg" data-bind="text: dealStatus"></h2>
+                        <span class="toggler" data-bind="text: toggleList, click: listToggle"></span>
+                    </div>
+                    <div>
+                        <p class="waiting" data-bind="html: loadImg"></p>
+                        <ul id="results-list" data-bind="visible: toggleList() === 'hide list', foreach: list">
+                            <li data-bind="click: $parent.goToMarker">
+                                <h4 data-bind="text: dealName"></h4>
+                                <p class="address" data-bind="html: dealAddress"></p>
+                                <p data-bind="text: dealShortBlurb"></p>
+                                <p data-bind="html: dealRating" class="rating"></p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile features, hidden until media query is activated -->
+            <div class="mobile-buttons">
+                <div title="toggle search bar" class="searchbtn" data-bind="click: searchToggle">
+                    <i class="fa fa-search"></i>
+                </div>
+
+                <div title="re-center map" class="locbtn" data-bind="click: centerMap">
+                    <i class="fa fa-compass"></i>
+                </div>
+
+                <div title="toggle list view" class="mobilebutton" data-bind="click: mobileToggleList">
+                    <i class="fa fa-bars"></i>
+                </div>
+            </div>
+        </div>
+        <div class="mobileresults" data-bind="visible: mobileShow() === true">
+            <div>
+                <h2 class="status-msg" data-bind="text: dealStatus"></h2>
+            </div>
+            <div>
+                <p class="waiting" data-bind="html: loadImg"></p>
+                <ul id="results-list" data-bind="visible: toggleList() === 'hide list', foreach: list">
+                    <li data-bind="click: $parent.goToMarker">
+                        <h4 data-bind="text: dealName"></h4>
+                        <p class="address" data-bind="html: dealAddress"></p>
+                        <p data-bind="text: dealShortBlurb"></p>
+                        <p data-bind="html: dealRating" class="rating"></p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div id="map-canvas"></div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyCBGBAXpCNT3udQC8vbh_3yJXIiJtJYn74"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
+    <script type="text/javascript" src="js/jquery.autocomplete.js"></script>
+    <script type="text/javascript" src="js/app.js"></script>
+
+</body>
+
+</html>
