@@ -4,7 +4,7 @@
 Find your best deals for Food & Drinks near Vancouver, look at our list of best places to eat or search for others restaurants, we offer you all the information you need to decide where to go today!  
 
 ***
-How to use
+How to run
 -------
 
 * Download all files [here](https://github.com/Fanfarlo/Neighborhood-Map-Project/archive/master.zip)
