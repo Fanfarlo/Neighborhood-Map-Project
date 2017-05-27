@@ -1,4 +1,5 @@
-function AppViewModel() {
+class AppViewModel {
+  constructor(){
   var self = this;
   var map, city, infowindow;
   var grouponLocations = [];
@@ -137,137 +138,7 @@ function AppViewModel() {
     $('#map').html('We had trouble loading Google Maps. Please refresh your browser and try again.');
   }, 8000);
 
-  // Initialize Google map.
-  function initMap() {
-    //styles from https://snazzymaps.com
-    var styles = [{
-        "featureType": "landscape",
-        "stylers": [{
-            "hue": "#F1FF00"
-          },
-          {
-            "saturation": -27.4
-          },
-          {
-            "lightness": 9.4
-          },
-          {
-            "gamma": 1
-          }
-        ]
-      },
-      {
-        "featureType": "road.highway",
-        "stylers": [{
-            "hue": "#0099FF"
-          },
-          {
-            "saturation": -20
-          },
-          {
-            "lightness": 36.4
-          },
-          {
-            "gamma": 1
-          }
-        ]
-      },
-      {
-        "featureType": "road.arterial",
-        "stylers": [{
-            "hue": "#00FF4F"
-          },
-          {
-            "saturation": 0
-          },
-          {
-            "lightness": 0
-          },
-          {
-            "gamma": 1
-          }
-        ]
-      },
-      {
-        "featureType": "road.local",
-        "stylers": [{
-            "hue": "#FFB300"
-          },
-          {
-            "saturation": -38
-          },
-          {
-            "lightness": 11.2
-          },
-          {
-            "gamma": 1
-          }
-        ]
-      },
-      {
-        "featureType": "water",
-        "stylers": [{
-            "hue": "#00B6FF"
-          },
-          {
-            "saturation": 4.2
-          },
-          {
-            "lightness": -63.4
-          },
-          {
-            "gamma": 1
-          }
-        ]
-      },
-      {
-        "featureType": "poi",
-        "stylers": [{
-            "hue": "#9FFF00"
-          },
-          {
-            "saturation": 0
-          },
-          {
-            "lightness": 0
-          },
-          {
-            "gamma": 1
-          }
-        ]
-      }
-    ];
 
-    city = new google.maps.LatLng(49.282729, -123.120738);
-    map = new google.maps.Map(document.getElementById('map'), {
-      center: city,
-      zoom: 13,
-      zoomControlOptions: {
-        position: google.maps.ControlPosition.LEFT_CENTER,
-        style: google.maps.ZoomControlStyle.SMALL
-      },
-      streetViewControlOptions: {
-        position: google.maps.ControlPosition.LEFT_BOTTOM
-      },
-      styles: styles,
-      mapTypeControl: false,
-      panControl: false
-    });
-
-    clearTimeout(self.mapRequestTimeout);
-
-    google.maps.event.addDomListener(window, "resize", function() {
-      var center = map.getCenter();
-      google.maps.event.trigger(map, "resize");
-      map.setCenter(center);
-    });
-
-    infowindow = new google.maps.InfoWindow({
-      maxWidth: 300
-    });
-    getGroupons('Vancouver');
-    getGrouponLocations();
-  }
 
   // Use API to get deal data and store the info as objects in an array
   function getGroupons(location) {
@@ -488,12 +359,152 @@ function AppViewModel() {
     }
   };
 
-initMap();
 
 }
+};
+
+// Initialize Google map.
+initMap = () => {
+
+  //styles from https://snazzymaps.com
+  var styles = [{
+      "featureType": "landscape",
+      "stylers": [{
+          "hue": "#F1FF00"
+        },
+        {
+          "saturation": -27.4
+        },
+        {
+          "lightness": 9.4
+        },
+        {
+          "gamma": 1
+        }
+      ]
+    },
+    {
+      "featureType": "road.highway",
+      "stylers": [{
+          "hue": "#0099FF"
+        },
+        {
+          "saturation": -20
+        },
+        {
+          "lightness": 36.4
+        },
+        {
+          "gamma": 1
+        }
+      ]
+    },
+    {
+      "featureType": "road.arterial",
+      "stylers": [{
+          "hue": "#00FF4F"
+        },
+        {
+          "saturation": 0
+        },
+        {
+          "lightness": 0
+        },
+        {
+          "gamma": 1
+        }
+      ]
+    },
+    {
+      "featureType": "road.local",
+      "stylers": [{
+          "hue": "#FFB300"
+        },
+        {
+          "saturation": -38
+        },
+        {
+          "lightness": 11.2
+        },
+        {
+          "gamma": 1
+        }
+      ]
+    },
+    {
+      "featureType": "water",
+      "stylers": [{
+          "hue": "#00B6FF"
+        },
+        {
+          "saturation": 4.2
+        },
+        {
+          "lightness": -63.4
+        },
+        {
+          "gamma": 1
+        }
+      ]
+    },
+    {
+      "featureType": "poi",
+      "stylers": [{
+          "hue": "#9FFF00"
+        },
+        {
+          "saturation": 0
+        },
+        {
+          "lightness": 0
+        },
+        {
+          "gamma": 1
+        }
+      ]
+    }
+  ];
+
+  city = new google.maps.LatLng(49.282729, -123.120738);
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: city,
+    zoom: 13,
+    zoomControlOptions: {
+      position: google.maps.ControlPosition.LEFT_CENTER,
+      style: google.maps.ZoomControlStyle.SMALL
+    },
+    streetViewControlOptions: {
+      position: google.maps.ControlPosition.LEFT_BOTTOM
+    },
+    styles: styles,
+    mapTypeControl: false,
+    panControl: false
+  });
+
+  clearTimeout(self.mapRequestTimeout);
+
+  google.maps.event.addDomListener(window, "resize", function() {
+    var center = map.getCenter();
+    google.maps.event.trigger(map, "resize");
+    map.setCenter(center);
+  });
+
+  infowindow = new google.maps.InfoWindow({
+    maxWidth: 300
+  });
+  getGroupons('Vancouver');
+  getGrouponLocations();
+
+};
+
+mapError = () => {
+  // Error handling
+  function googleError() {
+      alert("Google maps could not be loaded.");
+  }
+};
 
 //custom binding highlights the search text on focus
-
 ko.bindingHandlers.selectOnFocus = {
   update: function(element) {
     ko.utils.registerEventHandler(element, 'focus', function(e) {
@@ -502,4 +513,5 @@ ko.bindingHandlers.selectOnFocus = {
   }
 };
 
-ko.applyBindings(new AppViewModel());
+var vm = new AppViewModel();
+ko.applyBindings(vm);
