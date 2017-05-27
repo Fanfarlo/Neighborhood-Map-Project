@@ -1,9 +1,11 @@
+var grouponTopNames = [];
+
 class AppViewModel {
   constructor(){
   var self = this;
   var map, city, infowindow;
   var grouponLocations = [];
-  var grouponTopNames = [];
+
 
   this.markers = ko.observableArray([]); //holds all map markers
   this.grouponList = ko.observableArray([]); //list of deals
@@ -140,133 +142,11 @@ class AppViewModel {
 
 
 
-  // Use API to get deal data and store the info as objects in an array
-  function getGroupons(location) {
-    var grouponUrl = "https://partner-api.groupon.com/deals.json?tsToken=US_AFF_0_203644_212556_0&filters=category:food-and-drink&limit=7&offset=0&division_id=";
-    var divId = location;
-
-    $.ajax({
-      url: grouponUrl + divId,
-      dataType: 'jsonp',
-      success: function(data) {
-        //console.log(data);
-        var len = data.deals.length;
-        for (var i = 0; i < len; i++) {
-          var venueLocation = data.deals[i].options[0].redemptionLocations[0];
-
-          //filters out deals that don't have a physical location
-          if (data.deals[i].options[0].redemptionLocations[0] === undefined) continue;
-
-          var venueName = data.deals[i].merchant.name;
-          venueLat = venueLocation.lat,
-            venueLon = venueLocation.lng,
-            gLink = data.deals[i].dealUrl,
-            gImg = data.deals[i].mediumImageUrl,
-            blurb = data.deals[i].pitchHtml,
-            address = venueLocation.streetAddress1,
-            city = venueLocation.city,
-            state = venueLocation.state,
-            zip = venueLocation.postalCode,
-            shortBlurb = data.deals[i].announcementTitle,
-            tags = data.deals[i].tags;
-
-          // Yelp rating included.
-          //If there is no rating, function will stop
-
-          var rating;
-          if ((data.deals[i].merchant.ratings == null) || data.deals[i].merchant.ratings[0] === undefined) {
-            rating = '';
-          } else {
-            var num = data.deals[i].merchant.ratings[0].rating;
-            var decimal = num.toFixed(1);
-            rating = '<img src="img/burst_tiny.png"> ' + decimal + ' <span>out of 5</span>';
-          }
-
-          self.grouponList.push({
-            dealName: venueName,
-            dealLat: venueLat,
-            dealLon: venueLon,
-            dealLink: gLink,
-            dealImg: gImg,
-            dealBlurb: blurb,
-            dealAddress: address + "<br>" + city + ", " + state + " " + zip,
-            dealShortBlurb: shortBlurb,
-            dealRating: rating,
-            dealTags: tags
-          });
-
-        }
-        self.list(self.grouponList());
-        markers(self.grouponList());
-        self.searchStatus('');
-        self.loadImg('');
-      },
-      error: function() {
-        self.dealError('Oops, something went wrong, please refresh and try again.');
-        self.loadImg('');
-      }
-    });
-  }
 
 
 
-  // Create and place markers and info windows on the map based on data from API
-  function markers(array) {
-    $.each(array, function(index, value) {
-      var latitude = value.dealLat,
-        longitude = value.dealLon,
-        geoLoc = new google.maps.LatLng(latitude, longitude),
-        thisRestaurant = value.dealName;
-
-      var contentString = '<div id="infowindow">' +
-        '<img src="' + value.dealImg + '">' +
-        '<h2>' + value.dealName + '</h2>' +
-        '<p>' + value.dealAddress + '</p>' +
-        '<p class="rating">' + value.dealRating + '</p>' +
-        '<p><a href="' + value.dealLink + '" target="_blank">Click to view deal</a></p>' +
-        '<p>' + value.dealBlurb + '</p></div>';
-
-      var marker = new google.maps.Marker({
-        position: geoLoc,
-        title: thisRestaurant,
-        icon: defaultIcon,
-        map: map,
-        animation: google.maps.Animation.DROP,
-      });
 
 
-      self.markers.push({
-        marker: marker,
-        content: contentString
-      });
-
-      //Animation for marker
-
-      marker.addListener('click', function() {
-        if (this.getAnimation() !== null) {
-          this.setAnimation(null);
-          this.setIcon(defaultIcon);
-        } else {
-          this.setAnimation(google.maps.Animation.BOUNCE);
-          this.setIcon(highlightedIcon);
-        }
-      });
-
-
-
-      self.dealStatus(self.deals() + ' Best ' + ' food and drink deals recommendations at ' + self.searchLocation());
-
-      //generate infowindows for each deal
-      google.maps.event.addListener(marker, 'click', function() {
-        self.searchStatus('');
-        infowindow.setContent(contentString);
-        map.setZoom(16);
-        map.setCenter(marker.position);
-        infowindow.open(map, marker);
-        map.panBy(0, -150);
-      });
-    });
-  }
 
   // Clear markers from map and array
   function clearMarkers() {
@@ -287,23 +167,7 @@ class AppViewModel {
     }
   }
 
-  function getGrouponLocations() {
-    $.ajax({
-      url: 'https://partner-api.groupon.com/division.json',
-      dataType: 'jsonp',
-      success: function(data) {
-        grouponLocations = data;
-        for (var i = 0; i < 171; i++) {
-          var readableName = data.divisions[i].name;
-          grouponTopNames.push(readableName);
-        }
-      },
-      error: function() {
-        self.dealStatus('Something went wrong, please reload the page and try again.');
-        self.loadImg('');
-      }
-    });
-  }
+
 
 
   //Toggling the list view, location centering, and search bar on a mobile device.
@@ -515,6 +379,96 @@ ko.bindingHandlers.selectOnFocus = {
     });
   }
 };
+// ---------------------------------------------grouponLocations
+
+// Use API to get deal data and store the info as objects in an array
+function getGroupons(location) {
+  var grouponUrl = "https://partner-api.groupon.com/deals.json?tsToken=US_AFF_0_203644_212556_0&filters=category:food-and-drink&limit=7&offset=0&division_id=";
+  var divId = location;
+
+  $.ajax({
+    url: grouponUrl + divId,
+    dataType: 'jsonp',
+    success: function(data) {
+      //console.log(data);
+      var len = data.deals.length;
+      for (var i = 0; i < len; i++) {
+        var venueLocation = data.deals[i].options[0].redemptionLocations[0];
+
+        //filters out deals that don't have a physical location
+        if (data.deals[i].options[0].redemptionLocations[0] === undefined) continue;
+
+        var venueName = data.deals[i].merchant.name;
+        venueLat = venueLocation.lat,
+          venueLon = venueLocation.lng,
+          gLink = data.deals[i].dealUrl,
+          gImg = data.deals[i].mediumImageUrl,
+          blurb = data.deals[i].pitchHtml,
+          address = venueLocation.streetAddress1,
+          city = venueLocation.city,
+          state = venueLocation.state,
+          zip = venueLocation.postalCode,
+          shortBlurb = data.deals[i].announcementTitle,
+          tags = data.deals[i].tags;
+
+        // Yelp rating included.
+        //If there is no rating, function will stop
+
+        var rating;
+        if ((data.deals[i].merchant.ratings == null) || data.deals[i].merchant.ratings[0] === undefined) {
+          rating = '';
+        } else {
+          var num = data.deals[i].merchant.ratings[0].rating;
+          var decimal = num.toFixed(1);
+          rating = '<img src="img/burst_tiny.png"> ' + decimal + ' <span>out of 5</span>';
+        }
+
+        self.grouponList.push({
+          dealName: venueName,
+          dealLat: venueLat,
+          dealLon: venueLon,
+          dealLink: gLink,
+          dealImg: gImg,
+          dealBlurb: blurb,
+          dealAddress: address + "<br>" + city + ", " + state + " " + zip,
+          dealShortBlurb: shortBlurb,
+          dealRating: rating,
+          dealTags: tags
+        });
+
+      }
+      self.list(self.grouponList());
+      markers(self.grouponList());
+      self.searchStatus('');
+      self.loadImg('');
+    },
+    error: function() {
+      self.dealError('Oops, something went wrong, please refresh and try again.');
+      self.loadImg('');
+    }
+  });
+}
+// --------------------------------------
+function getGrouponLocations() {
+  $.ajax({
+    url: 'https://partner-api.groupon.com/division.json',
+    dataType: 'jsonp',
+    success: function(data) {
+      grouponLocations = data;
+      for (var i = 0; i < 171; i++) {
+        var readableName = data.divisions[i].name;
+        grouponTopNames.push(readableName);
+      }
+    },
+    error: function() {
+      self.dealStatus('Something went wrong, please reload the page and try again.');
+      self.loadImg('');
+    }
+  });
+}
+
+
+
 
 
 var vm = new AppViewModel();
