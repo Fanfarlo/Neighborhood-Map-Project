@@ -423,7 +423,7 @@ function getGroupons(location) {
           rating = '<img src="img/burst_tiny.png"> ' + decimal + ' <span>out of 5</span>';
         }
 
-        self.grouponList.push({
+        vm.grouponList.push({
           dealName: venueName,
           dealLat: venueLat,
           dealLon: venueLon,
@@ -437,14 +437,14 @@ function getGroupons(location) {
         });
 
       }
-      self.list(self.grouponList());
-      markers(self.grouponList());
-      self.searchStatus('');
-      self.loadImg('');
+      vm.list(vm.grouponList());
+      markers(vm.grouponList());
+      vm.searchStatus('');
+      vm.loadImg('');
     },
     error: function() {
-      self.dealError('Oops, something went wrong, please refresh and try again.');
-      self.loadImg('');
+      vm.dealError('Oops, something went wrong, please refresh and try again.');
+      vm.loadImg('');
     }
   });
 }
@@ -461,8 +461,8 @@ function getGrouponLocations() {
       }
     },
     error: function() {
-      self.dealStatus('Something went wrong, please reload the page and try again.');
-      self.loadImg('');
+      vm.dealStatus('Something went wrong, please reload the page and try again.');
+      vm.loadImg('');
     }
   });
 }
