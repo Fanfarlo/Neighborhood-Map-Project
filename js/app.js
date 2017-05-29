@@ -44,47 +44,7 @@ class AppViewModel {
     });
   };
 
-  // Handle the input given when user searches for deals in a location
-  this.processLocationSearch = function() {
 
-    self.searchStatus('');
-    self.searchStatus('Searching...');
-    var newAddress = this.searchLocation().replace(/\w\S*/g, function(txt) {
-      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
-    });
-
-
-    //hold the Groupon-formatted ID of the inputted city.
-    var newGrouponId;
-    for (var i = 0; i < 171; i++) {
-      var name = grouponLocations.divisions[i].name;
-      if (newAddress == name) {
-        newGrouponId = grouponLocations.divisions[i].id;
-        self.currentLat(grouponLocations.divisions[i].lat);
-        self.currentLng(grouponLocations.divisions[i].lng);
-      }
-    }
-    //Form validation
-    if (!newGrouponId) {
-      return self.searchStatus('Not a valid location, try again.');
-    } else {
-      //location for display in other KO bindings.
-      self.searchLocation(newAddress);
-
-      //clear current deal and marker arrays
-      clearMarkers();
-      self.grouponList([]);
-      self.list([]);
-      self.dealStatus('Loading...');
-      self.loadImg('<img src="img/loader.gif">');
-      //search and center map to new location
-      getGroupons(newGrouponId);
-      map.panTo({
-        lat: self.currentLat(),
-        lng: self.currentLng()
-      });
-    }
-  };
 
 
   this.filterKeyword = ko.observable('');
@@ -148,13 +108,7 @@ class AppViewModel {
 
 
 
-  // Clear markers from map and array
-  function clearMarkers() {
-    $.each(self.markers(), function(key, value) {
-      value.marker.setMap(null);
-    });
-    self.markers([]);
-  }
+
 
 
   function toggleBounce(marker) {
@@ -438,7 +392,7 @@ function getGroupons(location) {
 
       }
       vm.list(vm.grouponList());
-      markers(vm.grouponList());
+      vm.markers(vm.grouponList());
       vm.searchStatus('');
       vm.loadImg('');
     },
@@ -466,9 +420,55 @@ function getGrouponLocations() {
     }
   });
 }
+// Handle the input given when user searches for deals in a location
+this.processLocationSearch = function() {
+
+  vm.searchStatus('');
+  vm.searchStatus('Searching...');
+  var newAddress = this.searchLocation().replace(/\w\S*/g, function(txt) {
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+  });
 
 
+  //hold the Groupon-formatted ID of the inputted city.
+  var newGrouponId;
+  for (var i = 0; i < 171; i++) {
+    var name = grouponLocations.divisions[i].name;
+    if (newAddress == name) {
+      newGrouponId = grouponLocations.divisions[i].id;
+      vm.currentLat(grouponLocations.divisions[i].lat);
+      vm.currentLng(grouponLocations.divisions[i].lng);
+    }
+  }
+  //Form validation
+  if (!newGrouponId) {
+    return self.searchStatus('Not a valid location, try again.');
+  } else {
+    //location for display in other KO bindings.
+    vm.searchLocation(newAddress);
 
+    //clear current deal and marker arrays
+    clearMarkers();
+    vm.grouponList([]);
+    vm.list([]);
+    vm.dealStatus('Loading...');
+    vm.loadImg('<img src="img/loader.gif">');
+    //search and center map to new location
+    getGroupons(newGrouponId);
+    map.panTo({
+      lat: vm.currentLat(),
+      lng: vm.currentLng()
+    });
+  }
+};
+
+// Clear markers from map and array
+function clearMarkers() {
+  $.each(vm.markers(), function(key, value) {
+    value.marker.setMap(null);
+  });
+  vm.markers([]);
+}
 
 
 var vm = new AppViewModel();
