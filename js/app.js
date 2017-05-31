@@ -30,13 +30,13 @@ class AppViewModel {
       self.markers().forEach(function(key) {
         if (clickedDealName === key.marker.title) {
           map.panTo(key.marker.position);
-          map.setZoom(14);
+          map.setZoom(13);
           infowindow.setContent(key.content);
           infowindow.open(map, key.marker);
           map.panBy(0, -150);
           self.mobileShow(false);
           self.searchStatus('');
-          //animation for clicking on the list
+          //animation for double clicking on the list
           toggleBounce(key.marker);
         }
 
@@ -48,7 +48,7 @@ class AppViewModel {
     //Compare search keyword against existing deals.
     //Return a filtered list and map markers.
     this.filterResults = function() {
-      var searchWord = self.filterKeyword();
+      var searchWord = self.filterKeyword().toLowerCase();
       var array = self.grouponList();
       if (!searchWord) {
         return;
@@ -59,12 +59,16 @@ class AppViewModel {
         //with any of the deals in the list, if so push that object to the list array
         //and place the marker on the map.
         for (var i = 0; i < array.length; i++) {
-          if (array[i].dealName.toLowerCase().indexOf(searchWord) != -1) {
+          if (array[i].dealName.toLowerCase().indexOf(searchWord) != -1){
             self.markers()[i].marker.setMap(map);
             self.list.push(array[i]);
-          } else {
+          } else if (self.deals() != 0) {
+            self.markers()[i].marker.setVisible(true);
             self.dealStatus(self.deals() + ' deals found for ' + self.filterKeyword());
-
+          }
+          else {
+            self.markers()[i].marker.setVisible(false);
+            self.dealStatus(self.deals() + ' deals found for ' + self.filterKeyword());
           }
         }
       }
@@ -78,6 +82,7 @@ class AppViewModel {
       self.filterKeyword('');
       for (var i = 0; i < self.markers().length; i++) {
         self.markers()[i].marker.setMap(map);
+        self.markers()[i].marker.setVisible(true);
       }
     };
 
@@ -282,7 +287,7 @@ initMap = () => {
 
 // Use API to get deal data and store the info as objects in an array
 function getGroupons(location) {
-  var grouponUrl = "https://partner-api.groupon.com/deals.json?tsToken=US_AFF_0_203644_212556_0&filters=category:food-and-drink&limit=7&offset=0&division_id=";
+  var grouponUrl = "https://partner-api.groupon.com/deals.json?tsToken=US_AFF_0_203644_212556_0&filters=category:food-and-drink&limit=10&offset=0&division_id=";
   var divId = location;
 
   $.ajax({
@@ -387,7 +392,7 @@ this.processLocationSearch = function() {
   }
   //Form validation
   if (!newGrouponId) {
-    return self.searchStatus('Not a valid location, try again.');
+    return vm.searchStatus('Not a valid location, try again.');
   } else {
     //location for display in other KO bindings.
     vm.searchLocation(newAddress);
