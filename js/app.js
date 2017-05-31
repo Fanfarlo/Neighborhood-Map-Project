@@ -144,9 +144,9 @@ class AppViewModel {
         value.marker.setMap(null);
       });
       self.markers([]);
-    }
+    };
   }
-};
+}
 
 // Initialize Google map.
 initMap = () => {
@@ -377,7 +377,7 @@ this.processLocationSearch = function() {
   vm.searchStatus('');
   vm.searchStatus('Searching...');
   var newAddress = this.searchLocation().replace(/\w\S*/g, function(txt) {
-    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
   });
 
   //hold the Groupon-formatted ID of the inputted city.
