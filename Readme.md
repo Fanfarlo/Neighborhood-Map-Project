@@ -34,4 +34,4 @@ Resources
 * Knockout JS
 * Google Maps API
 * Groupon API
-* jQuery and Autocomplete jQuery
+* jQuery
