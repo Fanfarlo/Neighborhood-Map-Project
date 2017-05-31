@@ -1,94 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Vancouver Deals for Food & Drinks</title>
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="css/style.css">
-</head>
+  </head>
 
-<body>
+  <body>
     <main>
-        <header>
-            <div class="searchbar" data-bind="visible: searchBarShow() === true">
-                <h1>Vancouver Deals for Food & Drinks</h1>
-                <form data-bind="submit: processLocationSearch">
-                    <label>City</label>
-                    <input type="text" placeholder="Seach for your city" data-bind="textInput: searchLocation, selectOnFocus: true">
-                    <input type="submit" value="Search" id="submit">
-                    <p data-bind="text: searchStatus"></p>
-                </form>
-                <form data-bind="submit: filterResults" class="resultsform">
-                  <label>Seach in the List</label>
-                    <input type="text" placeholder="name" data-bind="value: filterKeyword, selectOnFocus: true">
-                    <input type="submit" value="Filtered!" id="submit">
-                    <p data-bind="visible: filterKeyword().length > 0, click: clearFilter" class="clearbutton">Clear filter</p>
-                </form>
+      <header>
+        <section class="searchbar" data-bind="visible: searchBarShow() === true">
+          <h1>Vancouver Deals for Food & Drinks</h1>
 
-                <div title="Re-center map" class="locbtn-large" data-bind="click: centerMap">
-                    <i class="fa fa-compass fa-2x"></i>
-                </div>
+          <form data-bind="submit: processLocationSearch">
+            <label>City</label>
+            <input type="text" placeholder="Seach for your city" data-bind="textInput: searchLocation, selectOnFocus: true">
+            <input type="submit" value="Search" id="submit">
+            <p data-bind="text: searchStatus"></p>
+          </form>
 
-                <section class="results">
-                    <div>
-                        <h2 class="status-msg" data-bind="text: dealStatus"></h2>
-                        <span class="toggler" data-bind="text: toggleList, click: listToggle"></span>
-                    </div>
-                    <div>
-                        <p class="waiting" data-bind="html: loadImg"></p>
-                        <ul id="results-list" data-bind="visible: toggleList() === 'hide list', foreach: list">
-                            <li data-bind="click: $parent.goToMarker">
-                                <h4 data-bind="text: dealName"></h4>
-                                <p class="address" data-bind="html: dealAddress"></p>
-                                <p data-bind="text: dealShortBlurb"></p>
-                                <p data-bind="html: dealRating" class="rating"></p>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-            <!-- Mobile features, hidden until media query is activated -->
-            <section class="mobile-buttons">
-                <div title="toggle search bar" class="searchbtn" data-bind="click: searchToggle">
-                    <i class="fa fa-search"></i>
-                </div>
+          <form data-bind="submit: filterResults" class="resultsform">
+            <label>Seach in the List</label>
+            <input type="text" placeholder="name" data-bind="value: filterKeyword, selectOnFocus: true">
+            <input type="submit" value="Filtered!" id="submit">
+            <p data-bind="visible: filterKeyword().length > 0, click: clearFilter" class="clearbutton">Clear filter</p>
+          </form>
 
-                <div title="re-center map" class="locbtn" data-bind="click: centerMap">
-                    <i class="fa fa-compass"></i>
-                </div>
+          <div title="Re-center map" class="locbtn-large" data-bind="click: centerMap">
+            <i class="fa fa-compass fa-2x"></i>
+          </div>
 
-                <div title="toggle list view" class="mobilebutton" data-bind="click: mobileToggleList">
-                    <i class="fa fa-bars"></i>
-                </div>
-            </section>
-        </header>
-        <div class="mobileresults" data-bind="visible: mobileShow() === true">
+          <div class="results">
             <div>
-                <h2 class="status-msg" data-bind="text: dealError"></h2>
+              <h2 class="status-msg" data-bind="text: dealStatus"></h2>
+              <span class="toggler" data-bind="text: toggleList, click: listToggle"></span>
             </div>
             <div>
-                <p class="waiting" data-bind="html: loadImg"></p>
-                <ul id="results-list" data-bind="visible: toggleList() === 'hide list', foreach: list">
-                    <li data-bind="click: $parent.goToMarker">
-                        <h4 data-bind="text: dealName"></h4>
-                        <p class="address" data-bind="html: dealAddress"></p>
-                        <p data-bind="text: dealShortBlurb"></p>
-                        <p data-bind="html: dealRating" class="rating"></p>
-                    </li>
-                </ul>
+              <p class="waiting" data-bind="html: loadImg"></p>
+              <ul id="results-list" data-bind="visible: toggleList() === 'hide list', foreach: list">
+                <li data-bind="click: $parent.goToMarker">
+                  <h4 data-bind="text: dealName"></h4>
+                  <p class="address" data-bind="html: dealAddress"></p>
+                  <p data-bind="text: dealShortBlurb"></p>
+                  <p data-bind="html: dealRating" class="rating"></p>
+                </li>
+              </ul>
             </div>
+          </div>
+        </section>
+
+        <!-- Mobile features, hidden until media query is activated -->
+        <section class="mobile-buttons">
+          <div title="toggle search bar" class="searchbtn" data-bind="click: searchToggle">
+            <i class="fa fa-search"></i>
+          </div>
+
+          <div title="re-center map" class="locbtn" data-bind="click: centerMap">
+            <i class="fa fa-compass"></i>
+          </div>
+
+          <div title="toggle list view" class="mobilebutton" data-bind="click: mobileToggleList">
+            <i class="fa fa-bars"></i>
+          </div>
+        </section>
+      </header>
+
+      <div class="mobileresults" data-bind="visible: mobileShow() === true">
+        <div>
+          <h2 class="status-msg" data-bind="text: dealError"></h2>
         </div>
-        <div id="map"></div>
+        <div>
+          <p class="waiting" data-bind="html: loadImg"></p>
+          <ul id="results-list" data-bind="visible: toggleList() === 'hide list', foreach: list">
+            <li data-bind="click: $parent.goToMarker">
+              <h4 data-bind="text: dealName"></h4>
+              <p class="address" data-bind="html: dealAddress"></p>
+              <p data-bind="text: dealShortBlurb"></p>
+              <p data-bind="html: dealRating" class="rating"></p>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div id="map"></div>
     </main>
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="js/app.js"></script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCBGBAXpCNT3udQC8vbh_3yJXIiJtJYn74&libraries=places&callback=initMap" onerror="mapError()"></script>
 
-</body>
-
+  </body>
 </html>

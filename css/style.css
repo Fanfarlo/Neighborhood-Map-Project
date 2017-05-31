@@ -225,6 +225,7 @@ header {
 }
 
 @media only screen and (max-width: 756px) {
+  
   main {
     height: 100%;
   }
