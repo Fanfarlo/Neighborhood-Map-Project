@@ -24,7 +24,7 @@
           </form>
 
           <form data-bind="submit: filterResults" class="resultsform">
-            <label>Seach in the List</label>
+            <label>Search in the List</label>
             <input type="text" placeholder="name" data-bind="value: filterKeyword, selectOnFocus: true">
             <input type="submit" value="Filtered!" id="submit">
             <p data-bind="visible: filterKeyword().length > 0, click: clearFilter" class="clearbutton">Clear filter</p>
@@ -85,7 +85,7 @@
           </ul>
         </div>
       </div>
-      
+
       <div id="map"></div>
     </main>
 
