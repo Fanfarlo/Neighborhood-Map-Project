@@ -1,166 +1,146 @@
 var grouponTopNames = [];
+var map, city, infowindow, defaultIcon, highlightedIcon;
+var grouponLocations = [];
 
 class AppViewModel {
-  constructor(){
-  var self = this;
-  var map, city, infowindow;
-  var grouponLocations = [];
-
-
-  this.markers = ko.observableArray([]); //holds all map markers
-  this.grouponList = ko.observableArray([]); //list of deals
-  this.list = ko.observableArray([]); //list filtered by search keyword
-  this.dealError = ko.observable();
-  this.dealStatus = ko.observable('Searching nerby...');
-  this.searchStatus = ko.observable();
-  this.searchLocation = ko.observable('Vancouver');
-  this.loadImg = ko.observable();
-  this.deals = ko.computed(function() {
-    return self.list().length;
-  });
-
-  //Holds value for list togglings
-  this.toggleList = ko.observable('hide list');
-
-  //Hold the current location's (lat & lng) - for re-centering map
-  this.currentLat = ko.observable(49.282729);
-  this.currentLng = ko.observable(-123.120738);
-
-  // If a deal is clicked, go to corresponding marker and open its info window.
-  this.goToMarker = function(clickedDeal) {
-    var clickedDealName = clickedDeal.dealName;
-    self.markers().forEach(function(key) {
-      if (clickedDealName === key.marker.title) {
-        map.panTo(key.marker.position);
-        map.setZoom(14);
-        infowindow.setContent(key.content);
-        infowindow.open(map, key.marker);
-        map.panBy(0, -150);
-        self.mobileShow(false);
-        self.searchStatus('');
-        //animation for clicking on the list
-        toggleBounce(key.marker);
-      }
+  constructor() {
+    var self = this;
+    this.markers = ko.observableArray([]); //holds all map markers
+    this.grouponList = ko.observableArray([]); //list of deals
+    this.list = ko.observableArray([]); //list filtered by search keyword
+    this.dealError = ko.observable();
+    this.dealStatus = ko.observable('Searching nerby...');
+    this.searchStatus = ko.observable();
+    this.searchLocation = ko.observable('Vancouver');
+    this.loadImg = ko.observable();
+    this.deals = ko.computed(function() {
+      return self.list().length;
     });
-  };
 
+    //Holds value for list togglings
+    this.toggleList = ko.observable('hide list');
 
+    //Hold the current location's (lat & lng) - for re-centering map
+    this.currentLat = ko.observable(49.282729);
+    this.currentLng = ko.observable(-123.120738);
 
+    // If a deal is clicked, go to corresponding marker and open its info window.
+    this.goToMarker = function(clickedDeal) {
+      var clickedDealName = clickedDeal.dealName;
+      self.markers().forEach(function(key) {
+        if (clickedDealName === key.marker.title) {
+          map.panTo(key.marker.position);
+          map.setZoom(14);
+          infowindow.setContent(key.content);
+          infowindow.open(map, key.marker);
+          map.panBy(0, -150);
+          self.mobileShow(false);
+          self.searchStatus('');
+          //animation for clicking on the list
+          toggleBounce(key.marker);
+        }
 
-  this.filterKeyword = ko.observable('');
+      });
+    };
 
-  //Compare search keyword against existing deals.
-  //Return a filtered list and map markers.
+    this.filterKeyword = ko.observable('');
 
-  this.filterResults = function() {
-    var searchWord = self.filterKeyword().toLowerCase();
-    var array = self.grouponList();
-    if (!searchWord) {
-      return;
-    } else {
-      //first clear out all entries in the list array
-      self.list([]);
-      //Loop through the grouponList array and see if the search keyword matches
-      //with any of the deals in the list, if so push that object to the list array
-      //and place the marker on the map.
-      for (var i = 0; i < array.length; i++) {
-        if (array[i].dealName.toLowerCase().indexOf(searchWord) != -1) {
-          self.markers()[i].marker.setMap(map);
-          self.list.push(array[i]);
-        } else {
-          self.dealStatus(self.deals() + ' deals found for ' + self.filterKeyword());
+    //Compare search keyword against existing deals.
+    //Return a filtered list and map markers.
+    this.filterResults = function() {
+      var searchWord = self.filterKeyword();
+      var array = self.grouponList();
+      if (!searchWord) {
+        return;
+      } else {
+        //first clear out all entries in the list array
+        self.list([]);
+        //Loop through the grouponList array and see if the search keyword matches
+        //with any of the deals in the list, if so push that object to the list array
+        //and place the marker on the map.
+        for (var i = 0; i < array.length; i++) {
+          if (array[i].dealName.toLowerCase().indexOf(searchWord) != -1) {
+            self.markers()[i].marker.setMap(map);
+            self.list.push(array[i]);
+          } else {
+            self.dealStatus(self.deals() + ' deals found for ' + self.filterKeyword());
 
+          }
         }
       }
+    };
+
+    //Clear keyword from filter
+    //Show all deals in current location again.
+    this.clearFilter = function() {
+      self.list(self.grouponList());
+      self.dealStatus(self.deals() + ' food and drink deals recommendations at ' + self.searchLocation());
+      self.filterKeyword('');
+      for (var i = 0; i < self.markers().length; i++) {
+        self.markers()[i].marker.setMap(map);
+      }
+    };
+
+    //toggles the list view
+    this.listToggle = function() {
+      if (self.toggleList() === 'hide list') {
+        self.toggleList('show');
+      } else {
+        self.toggleList('hide list');
+      }
+    };
+
+    function toggleBounce(marker) {
+      if (marker.getAnimation() !== null) {
+        marker.setAnimation(null);
+        marker.setIcon(defaultIcon);
+      } else {
+        marker.setAnimation(google.maps.Animation.BOUNCE);
+        marker.setIcon(highlightedIcon);
+      }
     }
-  };
 
-  //Clear keyword from filter
-  //Show all deals in current location again.
-  this.clearFilter = function() {
-    self.list(self.grouponList());
-    self.dealStatus(self.deals() + ' food and drink deals recommendations at ' + self.searchLocation());
-    self.filterKeyword('');
-    for (var i = 0; i < self.markers().length; i++) {
-      self.markers()[i].marker.setMap(map);
-    }
-  };
+    //Toggling the list view, location centering, and search bar on a mobile device.
+    this.mobileShow = ko.observable(false);
+    this.searchBarShow = ko.observable(true);
 
-  //toggles the list view
-  this.listToggle = function() {
-    if (self.toggleList() === 'hide list') {
-      self.toggleList('show');
-    } else {
-      self.toggleList('hide list');
-    }
-  };
+    this.mobileToggleList = function() {
+      if (self.mobileShow() === false) {
+        self.mobileShow(true);
+      } else {
+        self.mobileShow(false);
+      }
+    };
 
-  //Error handling for Google Maps
-  this.mapRequestTimeout = setTimeout(function() {
-    $('#map').html('We had trouble loading Google Maps. Please refresh your browser and try again.');
-  }, 8000);
+    this.searchToggle = function() {
+      if (self.searchBarShow() === true) {
+        self.searchBarShow(false);
+      } else {
+        self.searchBarShow(true);
+      }
+    };
 
-
-
-
-
-
-
-
-
-
-
-
-  function toggleBounce(marker) {
-    if (marker.getAnimation() !== null) {
-      marker.setAnimation(null);
-      marker.setIcon(defaultIcon);
-    } else {
-      marker.setAnimation(google.maps.Animation.BOUNCE);
-      marker.setIcon(highlightedIcon);
+    //Re-center map to current city
+    this.centerMap = function() {
+      infowindow.close();
+      var currCenter = map.getCenter();
+      var cityCenter = new google.maps.LatLng(self.currentLat(), self.currentLng());
+      if (cityCenter === currCenter) {
+        self.searchStatus('Map is already centered.');
+      } else {
+        self.searchStatus('');
+        map.panTo(cityCenter);
+        map.setZoom(12);
+      }
+    };
+    // Clear markers from map and array
+    this.clearMarkers = function() {
+      $.each(self.markers(), function(key, value) {
+        value.marker.setMap(null);
+      });
+      self.markers([]);
     }
   }
-
-
-
-
-  //Toggling the list view, location centering, and search bar on a mobile device.
-
-  this.mobileShow = ko.observable(false);
-  this.searchBarShow = ko.observable(true);
-
-  this.mobileToggleList = function() {
-    if (self.mobileShow() === false) {
-      self.mobileShow(true);
-    } else {
-      self.mobileShow(false);
-    }
-  };
-
-  this.searchToggle = function() {
-    if (self.searchBarShow() === true) {
-      self.searchBarShow(false);
-    } else {
-      self.searchBarShow(true);
-    }
-  };
-
-  //Re-center map to current city
-  this.centerMap = function() {
-    infowindow.close();
-    var currCenter = map.getCenter();
-    var cityCenter = new google.maps.LatLng(self.currentLat(), self.currentLng());
-    if (cityCenter === currCenter) {
-      self.searchStatus('Map is already centered.');
-    } else {
-      self.searchStatus('');
-      map.panTo(cityCenter);
-      map.setZoom(12);
-    }
-  };
-
-
-}
 };
 
 // Initialize Google map.
@@ -296,44 +276,11 @@ initMap = () => {
   getGroupons('Vancouver');
   getGrouponLocations();
 
-  // This function takes in a COLOR, and then creates a new marker
-  // icon of that color. The icon will be 21 px wide by 34 high, have an origin
-  // of 0, 0 and be anchored at 10, 34).
-  function makeMarkerIcon(markerColor) {
-    var markerImage = new google.maps.MarkerImage(
-      'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor +
-      '|40|_|%E2%80%A2',
-      new google.maps.Size(21, 34),
-      new google.maps.Point(0, 0),
-      new google.maps.Point(10, 34),
-      new google.maps.Size(21, 34));
-    return markerImage;
-  }
   // Style the markers a bit. This will be our listing marker icon.
-  var defaultIcon = makeMarkerIcon('0091ff');
-
-  // Create a "highlighted location" marker color for when the user
-  // mouses over the marker.
-  var highlightedIcon = makeMarkerIcon('FFFF24');
-
+  defaultIcon = makeMarkerIcon('0091ff');
+  highlightedIcon = makeMarkerIcon('FFFF24');
 };
 
-mapError = () => {
-  // Error handling
-  function googleError() {
-      alert("Google maps could not be loaded.");
-  }
-};
-
-//custom binding highlights the search text on focus
-ko.bindingHandlers.selectOnFocus = {
-  update: function(element) {
-    ko.utils.registerEventHandler(element, 'focus', function(e) {
-      element.select();
-    });
-  }
-};
-// ---------------------------------------------grouponLocations
 
 // Use API to get deal data and store the info as objects in an array
 function getGroupons(location) {
@@ -392,7 +339,7 @@ function getGroupons(location) {
 
       }
       vm.list(vm.grouponList());
-      vm.markers(vm.grouponList());
+      markers(vm.grouponList());
       vm.searchStatus('');
       vm.loadImg('');
     },
@@ -402,7 +349,8 @@ function getGroupons(location) {
     }
   });
 }
-// --------------------------------------
+// -grouponLocations
+
 function getGrouponLocations() {
   $.ajax({
     url: 'https://partner-api.groupon.com/division.json',
@@ -420,15 +368,14 @@ function getGrouponLocations() {
     }
   });
 }
+
 // Handle the input given when user searches for deals in a location
 this.processLocationSearch = function() {
-
   vm.searchStatus('');
   vm.searchStatus('Searching...');
   var newAddress = this.searchLocation().replace(/\w\S*/g, function(txt) {
     return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
   });
-
 
   //hold the Groupon-formatted ID of the inputted city.
   var newGrouponId;
@@ -448,7 +395,7 @@ this.processLocationSearch = function() {
     vm.searchLocation(newAddress);
 
     //clear current deal and marker arrays
-    clearMarkers();
+    vm.clearMarkers();
     vm.grouponList([]);
     vm.list([]);
     vm.dealStatus('Loading...');
@@ -461,15 +408,91 @@ this.processLocationSearch = function() {
     });
   }
 };
+// Create and place markers and info windows on the map based on data from API
+function markers(array) {
 
-// Clear markers from map and array
-function clearMarkers() {
-  $.each(vm.markers(), function(key, value) {
-    value.marker.setMap(null);
+  defaultIcon = makeMarkerIcon('0091ff');
+  highlightedIcon = makeMarkerIcon('FFFF24');
+
+  $.each(array, function(index, value) {
+    var latitude = value.dealLat,
+      longitude = value.dealLon,
+      geoLoc = new google.maps.LatLng(latitude, longitude),
+      thisRestaurant = value.dealName;
+
+    var contentString = '<div id="infowindow">' +
+      '<img src="' + value.dealImg + '">' +
+      '<h2>' + value.dealName + '</h2>' +
+      '<p>' + value.dealAddress + '</p>' +
+      '<p class="rating">' + value.dealRating + '</p>' +
+      '<p><a href="' + value.dealLink + '" target="_blank">Click to view deal</a></p>' +
+      '<p>' + value.dealBlurb + '</p></div>';
+
+    var marker = new google.maps.Marker({
+      position: geoLoc,
+      title: thisRestaurant,
+      icon: defaultIcon,
+      map: map,
+      animation: google.maps.Animation.DROP,
+    });
+
+
+    vm.markers.push({
+      marker: marker,
+      content: contentString
+    });
+
+    //Animation for marker
+
+    marker.addListener('click', function() {
+      if (this.getAnimation() !== null) {
+        this.setAnimation(null);
+        this.setIcon(defaultIcon);
+      } else {
+        this.setAnimation(google.maps.Animation.BOUNCE);
+        this.setIcon(highlightedIcon);
+      }
+    });
+
+    vm.dealStatus(vm.deals() + ' Best ' + ' food and drink deals recommendations at ' + vm.searchLocation());
+
+    //generate infowindows for each deal
+    google.maps.event.addListener(marker, 'click', function() {
+      vm.searchStatus('');
+      infowindow.setContent(contentString);
+      map.setZoom(16);
+      map.setCenter(marker.position);
+      infowindow.open(map, marker);
+      map.panBy(0, -150);
+    });
   });
-  vm.markers([]);
 }
 
+function makeMarkerIcon(markerColor) {
+  var markerImage = new google.maps.MarkerImage(
+    'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor +
+    '|40|_|%E2%80%A2',
+    new google.maps.Size(21, 34),
+    new google.maps.Point(0, 0),
+    new google.maps.Point(10, 34),
+    new google.maps.Size(21, 34));
+  return markerImage;
+}
+
+mapError = () => {
+  // Error handling
+  function googleError() {
+    alert("Google maps could not be loaded.");
+  }
+};
+//custom binding highlights the search text on focus
+ko.bindingHandlers.selectOnFocus = {
+  update: function(element) {
+    ko.utils.registerEventHandler(element, 'focus', function(e) {
+      element.select();
+    });
+  }
+};
 
 var vm = new AppViewModel();
 ko.applyBindings(vm);
