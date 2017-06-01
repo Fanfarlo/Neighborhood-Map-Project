@@ -130,7 +130,7 @@ class AppViewModel {
       } else {
         self.searchStatus('');
         map.panTo(cityCenter);
-        map.setZoom(12);
+        map.setZoom(10);
       }
     };
     // Clear markers from map and array
@@ -408,10 +408,9 @@ this.processLocationSearch = function() {
 };
 // Create and place markers and info windows on the map based on data from API
 function markers(array) {
-
   defaultIcon = makeMarkerIcon('0091ff');
   highlightedIcon = makeMarkerIcon('FFFF24');
-
+  var bounds = new google.maps.LatLngBounds();
   $.each(array, function(index, value) {
     var latitude = value.dealLat,
       longitude = value.dealLon,
@@ -434,6 +433,7 @@ function markers(array) {
       animation: google.maps.Animation.DROP,
     });
 
+    bounds.extend(marker.position);
 
     vm.markers.push({
       marker: marker,
@@ -472,6 +472,7 @@ function markers(array) {
        });
 
   });
+  map.fitBounds(bounds);
 }
 
 function makeMarkerIcon(markerColor) {
