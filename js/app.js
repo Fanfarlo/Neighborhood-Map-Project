@@ -445,14 +445,22 @@ function markers(array) {
 
     //Animation for marker
 
+    // marker.addListener('click', function() {
+    //   if (this.getAnimation() !== null) {
+    //     this.setAnimation(null);
+    //     this.setIcon(defaultIcon);
+    //   } else {
+    //     this.setAnimation(google.maps.Animation.BOUNCE);
+    //     this.setIcon(highlightedIcon);
+    //   }
+    // });
+
     marker.addListener('click', function() {
-      if (this.getAnimation() !== null) {
-        this.setAnimation(null);
-        this.setIcon(defaultIcon);
-      } else {
-        this.setAnimation(google.maps.Animation.BOUNCE);
-        this.setIcon(highlightedIcon);
-      }
+      this.setAnimation(google.maps.Animation.BOUNCE);
+      this.setIcon(highlightedIcon);
+      setTimeout(function(){
+        marker.setAnimation(null);
+        marker.setIcon(defaultIcon);; }, 700);
     });
 
     vm.dealStatus(vm.deals() + ' Best ' + ' food and drink deals recommendations at ' + vm.searchLocation());
@@ -473,6 +481,7 @@ function markers(array) {
                }, 3000);
              });
     });
+
   });
 }
 
