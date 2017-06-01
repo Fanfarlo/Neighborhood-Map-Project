@@ -94,15 +94,12 @@ class AppViewModel {
     };
 
     function toggleBounce(marker) {
-      if (marker.getAnimation() !== null) {
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+      marker.setIcon(highlightedIcon);
+      window.setTimeout(function(){
         marker.setAnimation(null);
-        marker.setIcon(defaultIcon);
-      } else {
-        marker.setAnimation(google.maps.Animation.BOUNCE);
-        marker.setIcon(highlightedIcon);
-      }
-    }
-
+        marker.setIcon(defaultIcon); }, 700);
+}
     //Toggling the list view, location centering, and search bar on a mobile device.
     this.mobileShow = ko.observable(false);
     this.searchBarShow = ko.observable(true);
@@ -345,7 +342,7 @@ function getGroupons(location) {
       vm.loadImg('');
     },
     error: function() {
-      vm.dealError('Oops, something went wrong, please refresh and try again.');
+      vm.errorGroupLoc('Oops, something went wrong, please refresh and try again.');
       vm.loadImg('');
     }
   });
@@ -443,24 +440,12 @@ function markers(array) {
       content: contentString
     });
 
-    //Animation for marker
-
-    // marker.addListener('click', function() {
-    //   if (this.getAnimation() !== null) {
-    //     this.setAnimation(null);
-    //     this.setIcon(defaultIcon);
-    //   } else {
-    //     this.setAnimation(google.maps.Animation.BOUNCE);
-    //     this.setIcon(highlightedIcon);
-    //   }
-    // });
-
     marker.addListener('click', function() {
       this.setAnimation(google.maps.Animation.BOUNCE);
       this.setIcon(highlightedIcon);
-      setTimeout(function(){
+      window.setTimeout(function(){
         marker.setAnimation(null);
-        marker.setIcon(defaultIcon);; }, 700);
+        marker.setIcon(defaultIcon); }, 700);
     });
 
     vm.dealStatus(vm.deals() + ' Best ' + ' food and drink deals recommendations at ' + vm.searchLocation());
@@ -473,14 +458,18 @@ function markers(array) {
       map.setCenter(marker.position);
       infowindow.open(map, marker);
       map.panBy(0, -150);
-      map.addListener('center_changed', function() {
-               // 3 seconds after the center of the map has changed, pan back to the
-               // marker.
-               window.setTimeout(function() {
+      window.setTimeout(function() {
                  map.panTo(marker.position);
                }, 3000);
-             });
     });
+
+  google.maps.event.addListener(marker, 'center_changed', function() {
+         // 3 seconds after the center of the map has changed, pan back to the
+         // marker.
+         window.setTimeout(function() {
+           map.panTo(marker.position);
+         }, 3000);
+       });
 
   });
 }
