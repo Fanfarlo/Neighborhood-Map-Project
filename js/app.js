@@ -10,6 +10,7 @@ class AppViewModel {
     this.list = ko.observableArray([]); //list filtered by search keyword
     this.dealError = ko.observable();
     this.dealStatus = ko.observable('Searching nerby...');
+    this.errorGroupLoc = ko.observable();
     this.searchStatus = ko.observable();
     this.searchLocation = ko.observable('Vancouver');
     this.loadImg = ko.observable();
@@ -51,6 +52,7 @@ class AppViewModel {
       var searchWord = self.filterKeyword().toLowerCase();
       var array = self.grouponList();
       if (!searchWord) {
+        self.clearFilter();
         return;
       } else {
         //first clear out all entries in the list array
@@ -62,12 +64,8 @@ class AppViewModel {
           if (array[i].dealName.toLowerCase().indexOf(searchWord) != -1){
             self.markers()[i].marker.setMap(map);
             self.list.push(array[i]);
-          } else if (self.deals() != 0) {
-            self.markers()[i].marker.setVisible(true);
-            self.dealStatus(self.deals() + ' deals found for ' + self.filterKeyword());
-          }
-          else {
-            self.markers()[i].marker.setVisible(false);
+          } else {
+            self.markers()[i].marker.setMap(null);
             self.dealStatus(self.deals() + ' deals found for ' + self.filterKeyword());
           }
         }
@@ -366,7 +364,7 @@ function getGrouponLocations() {
       }
     },
     error: function() {
-      vm.dealStatus('Something went wrong, please reload the page and try again.');
+      vm.errorGroupLoc('Something went wrong, please reload the page and try again.');
       vm.loadImg('');
     }
   });
@@ -463,10 +461,17 @@ function markers(array) {
     google.maps.event.addListener(marker, 'click', function() {
       vm.searchStatus('');
       infowindow.setContent(contentString);
-      map.setZoom(16);
+      map.setZoom(18);
       map.setCenter(marker.position);
       infowindow.open(map, marker);
       map.panBy(0, -150);
+      map.addListener('center_changed', function() {
+               // 3 seconds after the center of the map has changed, pan back to the
+               // marker.
+               window.setTimeout(function() {
+                 map.panTo(marker.position);
+               }, 3000);
+             });
     });
   });
 }
@@ -484,9 +489,7 @@ function makeMarkerIcon(markerColor) {
 
 mapError = () => {
   // Error handling
-  function googleError() {
-    alert("Google maps could not be loaded.");
-  }
+  alert("Google maps could not be loaded.");
 };
 //custom binding highlights the search text on focus
 ko.bindingHandlers.selectOnFocus = {

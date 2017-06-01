@@ -11,6 +11,7 @@
   </head>
 
   <body>
+    <main>
       <header>
         <section class="searchbar" data-bind="visible: searchBarShow() === true">
           <h1>Vancouver Deals for Food & Drinks</h1>
@@ -35,7 +36,9 @@
 
           <div class="results">
             <div>
-              <h2 class="status-msg" data-bind="text: dealStatus"></h2>
+              <h2 class="status-msg" data-bind="text: dealStatus, text: dealError, text: errorGroupLoc"></h2>
+
+
               <span class="toggler" data-bind="text: toggleList, click: listToggle"></span>
             </div>
             <div>
@@ -84,14 +87,14 @@
           </ul>
         </div>
       </div>
-      <main>
-      <div id="map"></div>
-      </main>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
+      <div id="map"></div>
+    </main>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
     <script src="js/app.js"></script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCBGBAXpCNT3udQC8vbh_3yJXIiJtJYn74&libraries=places&callback=initMap" onerror="mapError()"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCBGBAXpCNT3udQC8vbh_3yJXIiJtJYn74&libraries=places&callback=initMap" async defer onerror="mapError()"></script>
 
   </body>
 </html>
